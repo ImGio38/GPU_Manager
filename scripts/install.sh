@@ -7,6 +7,16 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+# Automatically find and append user's cargo directory to PATH if cargo isn't found
+if ! command -v cargo &> /dev/null; then
+  if [ -n "$SUDO_USER" ]; then
+    USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+    if [ -x "$USER_HOME/.cargo/bin/cargo" ]; then
+      export PATH="$PATH:$USER_HOME/.cargo/bin"
+    fi
+  fi
+fi
+
 echo "Building hw-control project..."
 cargo build --release
 
