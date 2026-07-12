@@ -9,6 +9,7 @@ pub enum IpcRequest {
         name: String, // "cpu" or "gpu"
         points: Vec<CurvePoint>,
     },
+    Uninstall,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
