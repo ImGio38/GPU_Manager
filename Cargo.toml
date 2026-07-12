@@ -1,0 +1,14 @@
+[workspace]
+resolver = "2"
+members = [
+    "hw-control-core",
+    "hw-control-daemon",
+    "hw-control-gui",
+]
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
+thiserror = "1.0"
+log = "0.4"
+env_logger = "0.11"
