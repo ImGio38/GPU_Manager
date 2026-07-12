@@ -50,8 +50,21 @@ else
   echo "/etc/hw-control.toml already exists, skipping."
 fi
 
+echo "Installing desktop launcher..."
+cat <<EOF > /usr/share/applications/hw-control.desktop
+[Desktop Entry]
+Type=Application
+Name=Hardware Controller
+Comment=Manage GPU Switching and Custom Fan Curves
+Exec=/usr/local/bin/hw-control-gui
+Icon=chip
+Terminal=false
+Categories=System;Settings;HardwareSettings;
+EOF
+chmod 644 /usr/share/applications/hw-control.desktop
+
 echo "Starting and enabling hw-control-daemon service..."
 systemctl enable --now hw-control.service
 
 echo "Installation complete!"
-echo "Daemon is running. GUI binary is available at /usr/local/bin/hw-control-gui"
+echo "Daemon is running. GUI application is installed in system menu and /usr/local/bin/hw-control-gui"

@@ -125,6 +125,43 @@ async fn handle_client(stream: tokio::net::UnixStream, state: Arc<Mutex<DaemonSt
                     IpcResponse::Error(format!("Fan curve name '{}' not found in configuration", name))
                 }
             }
+            IpcRequest::Uninstall => {
+                info!("Uninstall request received! Erasing application from system...");
+                
+                // Spawn a thread to delete files and stop the service after responding to the GUI
+                std::thread::spawn(|| {
+                    // Allow the response to be sent and flushed to the client socket first
+                    std::thread::sleep(std::time::Duration::from_millis(500));
+                    
+                    info!("Removing desktop launcher...");
+                    let _ = fs::remove_file("/usr/share/applications/hw-control.desktop");
+                    
+                    info!("Removing configuration file...");
+                    let _ = fs::remove_file("/etc/hw-control.toml");
+                    
+                    info!("Removing GUI binary...");
+                    let _ = fs::remove_file("/usr/local/bin/hw-control-gui");
+                    
+                    info!("Removing systemd service file...");
+                    let _ = fs::remove_file("/etc/systemd/system/hw-control.service");
+                    
+                    let _ = std::process::Command::new("systemctl").arg("daemon-reload").output();
+                    
+                    info!("Removing daemon binary...");
+                    let _ = fs::remove_file("/usr/local/bin/hw-control-daemon");
+                    
+                    info!("Disabling and stopping systemd service...");
+                    // This will send SIGTERM to us, executing the main SIGTERM handler to restore BIOS fans and clean up UDS
+                    let _ = std::process::Command::new("systemctl")
+                        .args(&["disable", "--now", "hw-control.service"])
+                        .output();
+                    
+                    // Fallback exit in case systemctl doesn't terminate us
+                    std::process::exit(0);
+                });
+
+                IpcResponse::Ok
+            }
         };
 
         // Write response back

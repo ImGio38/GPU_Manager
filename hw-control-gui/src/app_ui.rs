@@ -14,6 +14,7 @@ pub struct AppUi {
     unsaved_cpu_changes: bool,
     unsaved_gpu_changes: bool,
     daemon_connected: bool,
+    confirm_uninstall: bool,
 }
 
 #[derive(PartialEq, Eq)]
@@ -35,6 +36,7 @@ impl Default for AppUi {
             unsaved_cpu_changes: false,
             unsaved_gpu_changes: false,
             daemon_connected: false,
+            confirm_uninstall: false,
         }
     }
 }
@@ -396,6 +398,29 @@ impl eframe::App for AppUi {
                     });
                 }
             }
+
+            ui.add_space(15.0);
+            ui.separator();
+            ui.add_space(8.0);
+
+            ui.horizontal(|ui| {
+                if !self.confirm_uninstall {
+                    if ui.button(egui::RichText::new("Uninstall Application").color(egui::Color32::from_rgb(255, 100, 100))).clicked() {
+                        self.confirm_uninstall = true;
+                    }
+                } else {
+                    ui.label(egui::RichText::new("Are you sure? This completely removes the daemon, GUI launcher, and configurations.").color(egui::Color32::from_rgb(255, 120, 120)).strong());
+                    let btn = egui::Button::new(egui::RichText::new("Yes, Uninstall").color(egui::Color32::WHITE).strong())
+                        .fill(egui::Color32::from_rgb(180, 0, 0));
+                    if ui.add(btn).clicked() {
+                        let _ = send_request(&IpcRequest::Uninstall);
+                        std::process::exit(0);
+                    }
+                    if ui.button("Cancel").clicked() {
+                        self.confirm_uninstall = false;
+                    }
+                }
+            });
         });
     }
 }
