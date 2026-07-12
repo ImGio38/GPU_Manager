@@ -1,6 +1,14 @@
 # Linux Hardware Control System
 
-⚠️ **Status: Still in active development**
+```diff
+- ⚠️ PROJECT STATUS: STILL IN ACTIVE DEVELOPMENT & TEMPORARILY PAUSED
+```
+
+> [!WARNING]
+> **THIS PROJECT IS UNDER DEVELOPMENT AND CURRENTLY PAUSED.**  
+> Features are subject to change. Some system telemetry and fan controls may fall back to log mock patterns depending on your specific Linux distribution and hardware layout.
+
+---
 
 A production-grade, ultra-lightweight Linux hardware control system designed to manage global GPU switching (MUX control) and custom fan curve regulation.
 
